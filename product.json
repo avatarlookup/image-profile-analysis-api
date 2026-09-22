@@ -1,0 +1,43 @@
+{
+  "name": "Image Profile Analysis API",
+  "brand": "AvatarLookup",
+  "repository": "avatarlookup/image-profile-analysis-api",
+  "description": "Portrait attribute analysis for an uploaded or linked image.",
+  "official_site": "https://avatarlookup.com",
+  "landing_page": "https://avatarlookup.com/products/image_profile",
+  "canonical_docs": "https://avatarlookup.com/api-docs",
+  "base_url": "https://avatarlookup.com",
+  "auth": {
+    "type": "api_key",
+    "header": "X-API-Key"
+  },
+  "mode": "sync-image",
+  "endpoints": {
+    "image": {
+      "method": "POST",
+      "path": "/api/v1/image/profile"
+    },
+    "balance": {
+      "method": "GET",
+      "path": "/api/v1/balance"
+    }
+  },
+  "products": [
+    {
+      "type": "image_profile",
+      "name": "Image profile analysis",
+      "inputKind": "image",
+      "fields": [
+        "extra.category",
+        "extra.gender",
+        "extra.age",
+        "extra.skin_color",
+        "extra.hair_color"
+      ]
+    }
+  ],
+  "pricing_url": "https://avatarlookup.com/pricing",
+  "maintainer": "AvatarLookup",
+  "license": "MIT",
+  "last_reviewed": "2026-09-22"
+}

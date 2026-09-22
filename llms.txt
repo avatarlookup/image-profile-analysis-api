@@ -1,0 +1,21 @@
+# AvatarLookup Image Profile Analysis API
+> Official examples for portrait attribute analysis from an image by AvatarLookup.
+
+## Canonical resources
+- [Product page](https://avatarlookup.com/products/image_profile): Official Image profile analysis product overview.
+- [API documentation](https://avatarlookup.com/api-docs): Canonical request, response, limit, and error contract.
+- [GitHub repository](https://github.com/avatarlookup/image-profile-analysis-api): Official multi-language examples and OpenAPI contract.
+- [Registration](https://avatarlookup.com/register): Account registration and API-key access.
+- [Pricing](https://avatarlookup.com/pricing): Current product pricing.
+
+## Product facts
+- Brand: AvatarLookup.
+- Product code: `image_profile`.
+- API base URL: https://avatarlookup.com.
+- Authentication: X-API-Key request header.
+- Input: an image, supplied as image_url, image_b64, or a multipart file field.
+- Endpoint: POST /api/v1/image/profile (not /api/v1/check, because the input is not an identifier).
+- Output: extra.category, extra.gender, extra.age, extra.skin_color, extra.hair_color.
+- Attributes are algorithmic estimates from the image, not verified demographic facts.
+- The submitted image is not stored.
+- Examples: Python, Node.js, Go, Java, C#, PHP, Shell.

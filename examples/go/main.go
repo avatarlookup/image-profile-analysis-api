@@ -1,0 +1,30 @@
+package main
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+func main() {
+	key := os.Getenv("AVATARLOOKUP_API_KEY")
+	if key == "" {
+		panic("Set AVATARLOOKUP_API_KEY")
+	}
+	body := []byte("{\"product\":\"image_profile\",\"image_url\":\"https://example.com/portrait.jpg\"}")
+	req, _ := http.NewRequest("POST", "https://avatarlookup.com/api/v1/image/profile", bytes.NewReader(body))
+	req.Header.Set("X-API-Key", key)
+	req.Header.Set("Content-Type", "application/json")
+	r, e := http.DefaultClient.Do(req)
+	if e != nil {
+		panic(e)
+	}
+	defer r.Body.Close()
+	b, _ := io.ReadAll(r.Body)
+	if r.StatusCode >= 300 {
+		panic(string(b))
+	}
+	fmt.Println(string(b))
+}

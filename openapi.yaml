@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: Image Profile Analysis API
+  version: 1.0.0
+  description: Portrait attribute analysis for an uploaded or linked image.
+  contact:
+    name: AvatarLookup
+    url: https://avatarlookup.com/products/image_profile
+  license:
+    name: MIT
+    url: https://opensource.org/license/mit
+externalDocs:
+  description: AvatarLookup API documentation
+  url: https://avatarlookup.com/api-docs
+servers:
+  - url: https://avatarlookup.com
+security:
+  - ApiKeyAuth: []
+paths:
+  /api/v1/image/profile:
+    post:
+      summary: Analyse portrait attributes of an image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product]
+              properties:
+                product: { type: string, enum: [image_profile] }
+                image_url: { type: string, description: Publicly reachable image URL }
+                image_b64: { type: string, description: Base64 image payload }
+          multipart/form-data:
+            schema:
+              type: object
+              required: [product, file]
+              properties:
+                product: { type: string, enum: [image_profile] }
+                file: { type: string, format: binary }
+      responses:
+        '200':
+          description: Attribute result
+        '400': { description: Invalid input }
+        '401': { description: Invalid API key }
+        '402': { description: Insufficient balance }
+        '422': { description: Undetermined, not charged }
+  /api/v1/balance:
+    get:
+      summary: Current balance
+      responses:
+        '200': { description: Balance in data.balance_micros }
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
