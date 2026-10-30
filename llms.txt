@@ -1,21 +1,17 @@
 # AvatarLookup Image Profile Analysis API
-> Official examples for portrait attribute analysis from an image by AvatarLookup.
+> Official integration for public product code image_profile.
 
-## Canonical resources
-- [Product page](https://avatarlookup.com/products/image_profile): Official Image profile analysis product overview.
-- [API documentation](https://avatarlookup.com/api-docs): Canonical request, response, limit, and error contract.
-- [GitHub repository](https://github.com/avatarlookup/image-profile-analysis-api): Official multi-language examples and OpenAPI contract.
-- [Registration](https://avatarlookup.com/register): Account registration and API-key access.
-- [Pricing](https://avatarlookup.com/pricing): Current product pricing.
+- Product: https://avatarlookup.com/products/image_profile
+- Documentation: https://avatarlookup.com/api-docs
+- API key: https://avatarlookup.com/register?utm_source=github&utm_medium=referral&utm_campaign=avatarlookup_image-profile-analysis-api
+- OpenAPI: openapi.yaml
+- Base URL: https://avatarlookup.com; authentication: X-API-Key.
+- Endpoint: POST /api/v1/image/profile.
+- Request service_type: image_profile.
+- Result fields directly in data: service_type, identifier, category, age, gender, skin_color, hair_color. No extra/provider/profile_available layer.
+- age is an integer omitted when unknown; portrait strings may be unknown or empty.
+- Image input: HTTPS URL, base64 or multipart file; no phone/email identifier.
+- code=0 is success; 42200 is undetermined and uncharged. Network timeouts are not a reason for blind retries.
+- Current pricing: https://avatarlookup.com/pricing.
 
-## Product facts
-- Brand: AvatarLookup.
-- Product code: `image_profile`.
-- API base URL: https://avatarlookup.com.
-- Authentication: X-API-Key request header.
-- Input: an image, supplied as image_url, image_b64, or a multipart file field.
-- Endpoint: POST /api/v1/image/profile (not /api/v1/check, because the input is not an identifier).
-- Output: extra.category, extra.gender, extra.age, extra.skin_color, extra.hair_color.
-- Attributes are algorithmic estimates from the image, not verified demographic facts.
-- The submitted image is not stored.
-- Examples: Python, Node.js, Go, Java, C#, PHP, Shell.
+Last reviewed: 2026-10-30.

@@ -3,7 +3,7 @@ $key = getenv('AVATARLOOKUP_API_KEY');
 if (!$key) {
     throw new Exception('Set AVATARLOOKUP_API_KEY');
 }
-$body = json_encode(['product' => 'image_profile', 'image_url' => 'https://example.com/portrait.jpg'], JSON_THROW_ON_ERROR);
+$body = json_encode(['service_type' => 'image_profile', 'image_url' => 'https://example.com/portrait.jpg'], JSON_THROW_ON_ERROR);
 $curl = curl_init('https://avatarlookup.com/api/v1/image/profile');
 curl_setopt_array($curl, [
     CURLOPT_POST => true,

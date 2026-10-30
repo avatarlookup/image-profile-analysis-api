@@ -11,7 +11,7 @@ class ImageProfile
             ?? throw new Exception("Set AVATARLOOKUP_API_KEY");
         using var client = new HttpClient();
         client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
-        var content = new StringContent("{\"product\":\"image_profile\",\"image_url\":\"https://example.com/portrait.jpg\"}", Encoding.UTF8, "application/json");
+        var content = new StringContent("{\"service_type\":\"image_profile\",\"image_url\":\"https://example.com/portrait.jpg\"}", Encoding.UTF8, "application/json");
         var response = await client.PostAsync("https://avatarlookup.com/api/v1/image/profile", content);
         var body = await response.Content.ReadAsStringAsync();
         response.EnsureSuccessStatusCode();

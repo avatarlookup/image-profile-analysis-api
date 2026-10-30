@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Image Profile Analysis API
-  version: 1.0.0
+  version: 1.1.0
   description: Portrait attribute analysis for an uploaded or linked image.
   contact:
     name: AvatarLookup
@@ -13,46 +13,186 @@ externalDocs:
   description: AvatarLookup API documentation
   url: https://avatarlookup.com/api-docs
 servers:
-  - url: https://avatarlookup.com
+- url: https://avatarlookup.com
 security:
-  - ApiKeyAuth: []
+- ApiKeyAuth: []
 paths:
   /api/v1/image/profile:
     post:
-      summary: Analyse portrait attributes of an image
+      summary: Analyze one supplied image
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [product]
               properties:
-                product: { type: string, enum: [image_profile] }
-                image_url: { type: string, description: Publicly reachable image URL }
-                image_b64: { type: string, description: Base64 image payload }
+                service_type:
+                  type: string
+                  enum:
+                  - image_profile
+                image_url:
+                  type: string
+                  format: uri
+                  description: Public HTTPS URL using a domain name.
+                image_b64:
+                  type: string
+              anyOf:
+              - required:
+                - image_url
+              - required:
+                - image_b64
           multipart/form-data:
             schema:
               type: object
-              required: [product, file]
+              required:
+              - file
               properties:
-                product: { type: string, enum: [image_profile] }
-                file: { type: string, format: binary }
+                service_type:
+                  type: string
+                  enum:
+                  - image_profile
+                file:
+                  type: string
+                  format: binary
+                  description: JPEG, PNG, WebP or GIF; at most 2 MiB.
       responses:
         '200':
-          description: Attribute result
-        '400': { description: Invalid input }
-        '401': { description: Invalid API key }
-        '402': { description: Insufficient balance }
-        '422': { description: Undetermined, not charged }
+          description: Image-derived portrait attributes, directly in data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleEnvelope'
+        '400':
+          description: Invalid image, fields or input shape.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Invalid key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '402':
+          description: Insufficient balance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Undetermined; not charged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Concurrency limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Maintenance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/v1/balance:
     get:
-      summary: Current balance
+      summary: Read balance
       responses:
-        '200': { description: Balance in data.balance_micros }
+        '200':
+          description: Current balance in USD micros.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceEnvelope'
 components:
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       in: header
       name: X-API-Key
+  schemas:
+    Error:
+      type: object
+      required:
+      - code
+      - msg
+      properties:
+        code:
+          type: integer
+          description: Non-zero API error code.
+        msg:
+          type: string
+      description: An HTTP/API error is not a determined negative result.
+    BalanceEnvelope:
+      type: object
+      required:
+      - code
+      - msg
+      - data
+      properties:
+        code:
+          type: integer
+          enum:
+          - 0
+        msg:
+          type: string
+        data:
+          type: object
+          required:
+          - balance_micros
+          properties:
+            balance_micros:
+              type: integer
+              format: int64
+              description: USD micros; 1,000,000 equals USD 1.
+    CheckResult:
+      type: object
+      required:
+      - service_type
+      - identifier
+      - category
+      - gender
+      - skin_color
+      - hair_color
+      properties:
+        service_type:
+          type: string
+          enum:
+          - image_profile
+        identifier:
+          type: string
+        category:
+          type: string
+          description: Image-derived estimate; unknown/empty is not a verified personal fact.
+        age:
+          type: integer
+          description: Image-derived age estimate. Omitted when undetermined; no fabricated zero placeholder.
+        gender:
+          type: string
+          description: Image-derived estimate; unknown/empty is not a verified personal fact.
+        skin_color:
+          type: string
+          description: Image-derived estimate; unknown/empty is not a verified personal fact.
+        hair_color:
+          type: string
+          description: Image-derived estimate; unknown/empty is not a verified personal fact.
+    SingleEnvelope:
+      type: object
+      required:
+      - code
+      - msg
+      - data
+      properties:
+        code:
+          type: integer
+          enum:
+          - 0
+        msg:
+          type: string
+        data:
+          $ref: '#/components/schemas/CheckResult'

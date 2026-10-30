@@ -7,7 +7,7 @@ public class ImageProfile {
     public static void main(String[] args) throws Exception {
         String apiKey = System.getenv("AVATARLOOKUP_API_KEY");
         if (apiKey == null) throw new IllegalStateException("Set AVATARLOOKUP_API_KEY");
-        String body = "{\"product\":\"image_profile\",\"image_url\":\"https://example.com/portrait.jpg\"}";
+        String body = "{\"service_type\":\"image_profile\",\"image_url\":\"https://example.com/portrait.jpg\"}";
         HttpRequest request = HttpRequest.newBuilder(URI.create("https://avatarlookup.com/api/v1/image/profile"))
             .header("X-API-Key", apiKey)
             .header("Content-Type", "application/json")

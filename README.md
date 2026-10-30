@@ -1,25 +1,25 @@
-# Image Profile Analysis API — Portrait Attributes from an Image | AvatarLookup
+# Image Profile Analysis API | AvatarLookup
 
-The **AvatarLookup Image Profile Analysis API** reads portrait attributes from an image you supply. Unlike the other AvatarLookup products it takes an **image**, not an identifier, so it has its own endpoint: `POST /api/v1/image/profile`. This is the official AvatarLookup example repository, with integrations in seven languages.
+Portrait attribute analysis for an uploaded or linked image.
 
-- **Product page:** https://avatarlookup.com/products/image_profile
-- **API documentation:** https://avatarlookup.com/api-docs
-- **API base URL:** `https://avatarlookup.com`
-- **Authentication:** `X-API-Key`
-- **Get an API key:** https://avatarlookup.com/register
+- Product: https://avatarlookup.com/products/image_profile
+- API documentation: https://avatarlookup.com/api-docs
+- Get an API key: https://avatarlookup.com/register?utm_source=github&utm_medium=referral&utm_campaign=avatarlookup_image-profile-analysis-api
+- Base URL: `https://avatarlookup.com`; authentication: `X-API-Key`.
+- Public product code: `image_profile`.
 
-## How do I submit an image?
+## Request
 
-Two shapes are accepted. API integrations normally use JSON with a URL:
+Supply a public HTTPS image URL, a base64 image via `image_b64`, or a multipart `file` upload. JPEG, PNG, WebP and GIF are supported, up to 2 MiB. `service_type` selects `image_profile`; there is no phone/email identifier input. The image is not stored by AvatarLookup.
 
 ```bash
 curl -X POST 'https://avatarlookup.com/api/v1/image/profile' \
   -H 'X-API-Key: YOUR_API_KEY' \
   -H 'Content-Type: application/json' \
-  -d '{"product":"image_profile","image_url":"https://example.com/portrait.jpg"}'
+  -d '{"service_type":"image_profile","image_url":"https://example.com/portrait.jpg"}'
 ```
 
-`image_b64` accepts a base64 payload instead of a URL. A `multipart/form-data` request with a `file` field and a `product` field works as well.
+## Determined response
 
 ```json
 {
@@ -27,60 +27,46 @@ curl -X POST 'https://avatarlookup.com/api/v1/image/profile' \
   "msg": "ok",
   "data": {
     "service_type": "image_profile",
-    "extra": {
-      "category": "individual portrait",
-      "gender": "male",
-      "age": "27",
-      "skin_color": "white",
-      "hair_color": "black"
-    }
+    "identifier": "img:example",
+    "category": "individual portrait",
+    "age": 27,
+    "gender": "male",
+    "skin_color": "unknown",
+    "hair_color": "black"
   }
 }
 ```
 
-## What are the response fields?
+Result attributes are **directly under `data`**, not under `extra`. Internal `provider` and `profile_available` fields are not exposed. A successful response uses `code=0`; an error is not a negative result.
 
-| Field | Description |
+| Field | Meaning |
 |---|---|
-| `extra.category` | Image category, for example `individual portrait`. |
-| `extra.gender` | Presented gender estimated from the image. |
-| `extra.age` | Estimated age. |
-| `extra.skin_color` | Estimated skin tone. |
-| `extra.hair_color` | Estimated hair colour. |
+| `category` | Image category estimated from the avatar. |
+| `age` | Integer estimate; omitted when undetermined. |
+| `gender` | Gender presentation estimated from the avatar. |
+| `skin_color` | Skin-tone estimate derived from the avatar. |
+| `hair_color` | Hair-colour estimate derived from the avatar. |
 
-These are **algorithmic estimates derived from an image**. They are auxiliary references only — not verified demographic facts about a real person — and must not drive high-impact decisions, screening, tracking, or profiling the subject has not agreed to.
+Image attributes are algorithmic estimates, not verified facts about a person. String attributes may be `unknown` or empty; `age` is an integer and is omitted when undetermined. Do not use estimates for high-impact decisions or unauthorized profiling.
 
-## What are the limits and error codes?
 
-- The image is passed straight to the analysis upstream and is **not stored**: it is never written to disk or object storage by AvatarLookup.
-- `40000`/`40001` are request or JSON errors; `40100` is an invalid key; `40200` is insufficient balance; `42200` is undetermined and uncharged; `42900` is rate limited — honour `Retry-After`; `50300` is temporary maintenance.
-- `GET /api/v1/balance` returns the current balance in `data.balance_micros`.
 
-Keep the key on a trusted server and read it from `AVATARLOOKUP_API_KEY`. Never commit it or expose it in production browser code.
+## Errors and limits
 
-## Runnable examples in seven languages
+The default per-user concurrency budget is five in-flight requests.  `40000`/`40001` are request or input errors, `40100` invalid key, `40200` insufficient balance, `42200` undetermined and uncharged, `42900`/`42901` rate/concurrency limits, and `50300` maintenance. Honor `Retry-After`. Do not automatically repeat a potentially billed request after an uncertain network timeout.
 
-| Language | Example |
-|---|---|
-| Python | [`examples/python`](examples/python) |
-| Node.js | [`examples/nodejs`](examples/nodejs) |
-| Go | [`examples/go`](examples/go) |
-| Java | [`examples/java`](examples/java) |
-| C# | [`examples/csharp`](examples/csharp) |
-| PHP | [`examples/php`](examples/php) |
-| Shell / curl | [`examples/shell`](examples/shell) |
+`GET /api/v1/balance` returns `data.balance_micros` (1,000,000 = USD 1). See [current pricing](https://avatarlookup.com/pricing); prices are not hard-coded here.
 
-## Official resources and responsible use
+## Examples and resources
 
-- **Product:** https://avatarlookup.com/products/image_profile
-- **Documentation:** https://avatarlookup.com/api-docs
-- **Registration:** https://avatarlookup.com/register
-- **Pricing:** https://avatarlookup.com/pricing
-- **OpenAPI contract:** [`openapi.yaml`](openapi.yaml)
-- **License:** [MIT](LICENSE) for the sample code
+Seven server-side examples: [Python](examples/python), [Node.js](examples/nodejs), [Go](examples/go), [Java](examples/java), [C#](examples/csharp), [PHP](examples/php), [Shell](examples/shell). Follow each language README. Python and Node.js support image JSON requests; other clients demonstrate the request shown in their source.
 
-Submit only images you are authorized to process, and comply with applicable privacy laws. This product is not facial recognition, identity verification, or proof of anything about the person shown.
+Read `AVATARLOOKUP_API_KEY` from the server environment. Never commit it or expose it in browser code. Only submit identifiers/images you are authorized to process.
 
----
+- Product: https://avatarlookup.com/products/image_profile
+- Documentation: https://avatarlookup.com/api-docs
+- Registration: https://avatarlookup.com/register?utm_source=github&utm_medium=referral&utm_campaign=avatarlookup_image-profile-analysis-api
+- OpenAPI: [openapi.yaml](openapi.yaml)
+- License: [MIT](LICENSE)
 
-*Last reviewed: 2026-09-22 · Maintained by AvatarLookup. Canonical product page: https://avatarlookup.com/products/image_profile*
+*Last reviewed: 2026-10-30 · Maintained by AvatarLookup.*

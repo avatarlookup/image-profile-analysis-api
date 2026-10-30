@@ -28,16 +28,18 @@
       "name": "Image profile analysis",
       "inputKind": "image",
       "fields": [
-        "extra.category",
-        "extra.gender",
-        "extra.age",
-        "extra.skin_color",
-        "extra.hair_color"
+        "service_type",
+        "identifier",
+        "category",
+        "age",
+        "gender",
+        "skin_color",
+        "hair_color"
       ]
     }
   ],
   "pricing_url": "https://avatarlookup.com/pricing",
   "maintainer": "AvatarLookup",
   "license": "MIT",
-  "last_reviewed": "2026-09-22"
+  "last_reviewed": "2026-10-30"
 }

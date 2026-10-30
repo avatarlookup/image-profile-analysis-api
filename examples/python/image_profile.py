@@ -9,8 +9,11 @@ image_url = os.getenv("IMAGE_URL", "https://example.com/portrait.jpg")
 response = requests.post(
     f"{base_url}/api/v1/image/profile",
     headers={"X-API-Key": api_key},
-    json={"product": "image_profile", "image_url": image_url},
+    json={"service_type": "image_profile", "image_url": image_url},
     timeout=60,
 )
 response.raise_for_status()
-print(response.json())
+result = response.json()
+if result.get("code") != 0:
+    raise RuntimeError(f"API error: {result}")
+print(result)
